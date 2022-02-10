@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package main;
+package proto;
 
-option go_package = "/proto";
+option go_package = "./proto";
 
 message String {
   string value = 1;
