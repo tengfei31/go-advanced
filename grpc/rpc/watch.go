@@ -30,7 +30,7 @@ type KVStoreService struct {
 
 func NewKVStoreService() *KVStoreService {
 	return &KVStoreService{
-		m: make(map[string]string),
+		m:      make(map[string]string),
 		filter: make(map[string]func(key string)),
 	}
 }
@@ -74,12 +74,11 @@ func (p *KVStoreService) Watch(timeout time.Duration, keyChanged *string) error 
 
 	var err error
 	select {
-	case <- time.After(timeout * time.Second):
+	case <-time.After(timeout * time.Second):
 		err = fmt.Errorf("timeout")
-	case key := <- ch:
+	case key := <-ch:
 		*keyChanged = key
 		err = nil
 	}
 	return err
 }
-

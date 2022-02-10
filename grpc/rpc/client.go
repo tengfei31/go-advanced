@@ -40,21 +40,21 @@ func JsonClient() {
 	}
 	var client = rpc.NewClientWithCodec(jsonrpc.NewClientCodec(conn))
 	var reply string
-	err = client.Call(HelloServiceName + ".Hello", "client", &reply)
+	err = client.Call(HelloServiceName+".Hello", "client", &reply)
 	if err != nil {
 		log.Fatalln("call HelloService.Hello fail:", err)
 	}
 	log.Println("client recv:", reply)
 }
 
-func kvStoreClient(){
+func kvStoreClient() {
 	conn, err := net.Dial(Protocol, Ip+Port)
 	if err != nil {
 		log.Fatalln("dialing:", err)
 	}
 	var client = rpc.NewClient(conn)
 	var value string
-	err = client.Call(KVStoreServiceName + ".Get", "abc", &value)
+	err = client.Call(KVStoreServiceName+".Get", "abc", &value)
 	if err != nil {
 		log.Fatalf("call %s.Get fail:%v", KVStoreServiceName, err)
 	}
@@ -65,19 +65,18 @@ func kvStoreClient(){
 func doClientWork(client *rpc.Client) {
 	go func() {
 		var keyChanged string
-		err := client.Call(KVStoreServiceName + ".Watch", 30, &keyChanged)
+		err := client.Call(KVStoreServiceName+".Watch", 30, &keyChanged)
 		if err != nil {
 			log.Fatal(err)
 		}
 		log.Println("watch:", keyChanged)
 	}()
-	err := client.Call(KVStoreServiceName + ".Set", [2]string{"abc", "abc-value"}, new(struct{}))
+	err := client.Call(KVStoreServiceName+".Set", [2]string{"abc", "abc-value"}, new(struct{}))
 	if err != nil {
 		log.Fatal(err)
 	}
 	time.Sleep(time.Second * 3)
 }
-
 
 func proxyClient() {
 	listener, err := net.Listen("tcp", ":1234")
@@ -100,15 +99,14 @@ func proxyClient() {
 	doClientWorkProxy(clientChan)
 }
 
-func doClientWorkProxy(clientChan <- chan *rpc.Client) {
-	client := <- clientChan
+func doClientWorkProxy(clientChan <-chan *rpc.Client) {
+	client := <-clientChan
 	defer client.Close()
 
 	var reply string
-	err := client.Call(HelloServiceName + ".Hello", "hello", &reply)
+	err := client.Call(HelloServiceName+".Hello", "hello", &reply)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Println(reply)
 }
-
