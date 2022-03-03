@@ -4,7 +4,9 @@ import (
 	"context"
 	"go-advanced/grpc/proto"
 	"google.golang.org/grpc"
+	"io"
 	"log"
+	"time"
 )
 
 func main() {
@@ -15,10 +17,43 @@ func main() {
 	defer conn.Close()
 
 	client := proto.NewHelloServiceClient(conn)
-	reply, err := client.Hello(context.Background(), &proto.String{Value: "client"})
+	channel(client)
+	for {
+		time.Sleep(time.Hour)
+	}
+	//reply, err := client.Hello(context.Background(), &proto.String{Value: "client"})
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//log.Println(reply.GetValue())
+}
+
+func channel(client proto.HelloServiceClient) {
+	stream, err := client.Channel(context.Background())
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(reply.GetValue())
+	go func() {
+		for {
+			reply := &proto.String{Value: "hi"}
+			err = stream.Send(reply)
+			if err != nil {
+				log.Fatal(err)
+			}
+			time.Sleep(time.Second)
+		}
+	}()
 
+	go func() {
+		for {
+			reply, err := stream.Recv()
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+				log.Fatal(err)
+			}
+			log.Println(reply.GetValue())
+		}
+	}()
 }
