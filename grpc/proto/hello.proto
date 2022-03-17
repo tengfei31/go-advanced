@@ -14,3 +14,10 @@ service HelloService {
   rpc Channel (stream String) returns (stream String);
 }
 
+service PubsubService {
+  rpc Publish (String) returns (String);
+  rpc Subscribe (String) returns (stream String);
+}
+
+
+

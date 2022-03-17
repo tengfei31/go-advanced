@@ -16,11 +16,14 @@ func main() {
 	}
 	defer conn.Close()
 
-	client := proto.NewHelloServiceClient(conn)
-	channel(client)
+	publish(conn)
+
+	//client := proto.NewHelloServiceClient(conn)
+	//channel(client)
 	for {
 		time.Sleep(time.Hour)
 	}
+
 	//reply, err := client.Hello(context.Background(), &proto.String{Value: "client"})
 	//if err != nil {
 	//	log.Fatal(err)
@@ -56,4 +59,18 @@ func channel(client proto.HelloServiceClient) {
 			log.Println(reply.GetValue())
 		}
 	}()
+}
+
+func publish(conn *grpc.ClientConn) {
+	client := proto.NewPubsubServiceClient(conn)
+
+	_, err := client.Publish(context.Background(), &proto.String{Value: "golang: hello Go"})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = client.Publish(context.Background(), &proto.String{Value: "docker: hello Docker"})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
