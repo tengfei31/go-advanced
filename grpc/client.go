@@ -4,13 +4,18 @@ import (
 	"context"
 	"go-advanced/grpc/proto"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"io"
 	"log"
 	"time"
 )
 
 func main() {
-	conn, err := grpc.Dial(":1234", grpc.WithInsecure())
+	creds, err := credentials.NewClientTLSFromFile("secret/server.crt", "server.grpc.io")
+	if err != nil {
+		log.Fatal(err)
+	}
+	conn, err := grpc.Dial(":1234", grpc.WithTransportCredentials(creds))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -20,9 +25,9 @@ func main() {
 
 	//client := proto.NewHelloServiceClient(conn)
 	//channel(client)
-	for {
-		time.Sleep(time.Hour)
-	}
+	//for {
+	//	time.Sleep(time.Hour)
+	//}
 
 	//reply, err := client.Hello(context.Background(), &proto.String{Value: "client"})
 	//if err != nil {

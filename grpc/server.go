@@ -3,6 +3,7 @@ package main
 import (
 	"go-advanced/grpc/proto"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"log"
 	"net"
 )
@@ -22,7 +23,11 @@ func helloServiceImpl() {
 }
 
 func pubsubService() {
-	grpcServer := grpc.NewServer()
+	creds, err := credentials.NewServerTLSFromFile("secret/server.crt", "secret/server.key")
+	if err != nil {
+		log.Fatal(err)
+	}
+	grpcServer := grpc.NewServer(grpc.Creds(creds))
 	proto.RegisterPubsubServiceServer(grpcServer, NewPubsubService())
 	lis, err := net.Listen("tcp", ":1234")
 	if err != nil {
