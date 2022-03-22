@@ -12,8 +12,10 @@ import (
 )
 
 func main() {
+	helloServiceImpl()
 	//pubsubService()
-	pubsubServiceTLS()
+	//pubsubServiceTLS()
+	//pubsubServiceNoTLS()
 }
 
 func helloServiceImpl() {
@@ -61,6 +63,16 @@ func pubsubService() {
 		log.Fatal(err)
 	}
 	grpcServer := grpc.NewServer(grpc.Creds(creds))
+	proto.RegisterPubsubServiceServer(grpcServer, NewPubsubService())
+	lis, err := net.Listen("tcp", ":1234")
+	if err != nil {
+		log.Fatal(err)
+	}
+	grpcServer.Serve(lis)
+}
+
+func pubsubServiceNoTLS() {
+	grpcServer := grpc.NewServer()
 	proto.RegisterPubsubServiceServer(grpcServer, NewPubsubService())
 	lis, err := net.Listen("tcp", ":1234")
 	if err != nil {

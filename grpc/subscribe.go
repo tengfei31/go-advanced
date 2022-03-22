@@ -14,7 +14,8 @@ import (
 
 func main() {
 	//subscribeBaseTLS()
-	subscribeClientTLS()
+	//subscribeClientTLS()
+	subscribeNoTLS()
 }
 
 func subscribeClientTLS() {
@@ -51,6 +52,16 @@ func subscribeBaseTLS() {
 		log.Fatal(err)
 	}
 	conn, err := grpc.Dial(":1234", grpc.WithTransportCredentials(creds))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+
+	subscribe(conn)
+}
+
+func subscribeNoTLS() {
+	conn, err := grpc.Dial(":1234", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -2,25 +2,42 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/docker/docker/pkg/pubsub"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 	"io"
 	"strings"
 	"time"
 )
 import "go-advanced/grpc/proto"
 
-type HelloServiceImpl struct{}
-
-func NewHelloServiceImpl() *HelloServiceImpl {
-	return &HelloServiceImpl{}
+// 增加用户认证
+type grpcServer struct {
+	auth *Authentication
 }
 
-func (p *HelloServiceImpl) Hello(ctx context.Context, args *proto.String) (*proto.String, error) {
+type HelloServiceImpl struct{}
+
+func NewHelloServiceImpl() *grpcServer {
+	return &grpcServer{
+		auth: &Authentication{
+			User:     "gopher",
+			Password: "password",
+		},
+	}
+}
+
+func (p *grpcServer) Hello(ctx context.Context, args *proto.String) (*proto.String, error) {
+	if err := p.auth.Auth(ctx); err != nil {
+		return nil, err
+	}
 	reply := &proto.String{Value: "hello:" + args.GetValue()}
 	return reply, nil
 }
 
-func (p *HelloServiceImpl) Channel(stream proto.HelloService_ChannelServer) error {
+func (p *grpcServer) Channel(stream proto.HelloService_ChannelServer) error {
 	for {
 		args, err := stream.Recv()
 		if err != nil {
@@ -69,6 +86,39 @@ func (p *PubsubService) Subscribe(arg *proto.String, stream proto.PubsubService_
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+type Authentication struct {
+	User     string
+	Password string
+}
+
+func (auth *Authentication) GetRequestMetadata(ctx context.Context, opts ...string) (map[string]string, error) {
+	return map[string]string{"user": auth.User, "password": auth.Password}, nil
+}
+
+func (auth *Authentication) RequireTransportSecurity() bool {
+	return false
+}
+
+func (auth *Authentication) Auth(ctx context.Context) error {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return fmt.Errorf("missing credentials")
+	}
+	var appid, appKey string
+	if val, ok := md["user"]; ok {
+		appid = val[0]
+	}
+	if val, ok := md["password"]; ok {
+		appKey = val[0]
+	}
+
+	if appid != auth.User || appKey != auth.Password {
+		return status.Errorf(codes.Unauthenticated, "invalid token")
 	}
 
 	return nil

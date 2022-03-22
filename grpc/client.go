@@ -14,13 +14,13 @@ import (
 )
 
 func main() {
-	mainClientTLS()
+	//mainClientTLS()
 
 	//mainServerTLS()
 
 	//mainNoTLS()
 
-	//mainBaseGrpc()
+	mainBaseGrpc()
 }
 
 // 利用客户端证书和CA根证书、服务器名字验证
@@ -70,7 +70,11 @@ func mainServerTLS() {
 
 // 无证书认证
 func mainNoTLS() {
-	conn, err := grpc.Dial(":1234", grpc.WithInsecure())
+	auth := Authentication{
+		User:     "gopher",
+		Password: "password",
+	}
+	conn, err := grpc.Dial(":1234", grpc.WithInsecure(), grpc.WithPerRPCCredentials(&auth))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -81,23 +85,27 @@ func mainNoTLS() {
 
 // 基础的GRPC
 func mainBaseGrpc() {
-	conn, err := grpc.Dial(":1234", grpc.WithInsecure())
+	auth := Authentication{
+		User:     "gopher",
+		Password: "password",
+	}
+	conn, err := grpc.Dial(":1234", grpc.WithInsecure(), grpc.WithPerRPCCredentials(&auth))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer conn.Close()
 
 	client := proto.NewHelloServiceClient(conn)
-	channel(client)
-	for {
-		time.Sleep(time.Hour)
-	}
-
-	//reply, err := client.Hello(context.Background(), &proto.String{Value: "client"})
-	//if err != nil {
-	//	log.Fatal(err)
+	//channel(client)
+	//for {
+	//	time.Sleep(time.Hour)
 	//}
-	//log.Println(reply.GetValue())
+
+	reply, err := client.Hello(context.Background(), &proto.String{Value: "client"})
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(reply.GetValue())
 }
 
 func channel(client proto.HelloServiceClient) {
