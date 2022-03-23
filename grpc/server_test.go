@@ -50,7 +50,7 @@ func TestPubsubServiceTLS(t *testing.T) {
 		ClientAuth:   tls.RequireAndVerifyClientCert,
 		ClientCAs:    certPool,
 	})
-	grpcServer := grpc.NewServer(grpc.Creds(creds))
+	grpcServer := grpc.NewServer(grpc.Creds(creds), grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(filter)))
 	proto.RegisterPubsubServiceServer(grpcServer, NewPubsubService())
 	lis, err := net.Listen("tcp", ":1234")
 	if err != nil {

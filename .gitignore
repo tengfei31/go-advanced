@@ -16,7 +16,7 @@
 
 # idea
 .idea
-.vscode
+.vscode/settings.json
 
 #mac OS
 .DS_Store
