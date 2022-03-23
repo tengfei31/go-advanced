@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"go-advanced/grpc/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -19,7 +22,8 @@ func main() {
 }
 
 func helloServiceImpl() {
-	grpcServer := grpc.NewServer()
+	// 利用第三方中间件来增加多个过滤器
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(filter)))
 	proto.RegisterHelloServiceServer(grpcServer, NewHelloServiceImpl())
 	lis, err := net.Listen("tcp", ":1234")
 	if err != nil {
@@ -79,4 +83,15 @@ func pubsubServiceNoTLS() {
 		log.Fatal(err)
 	}
 	grpcServer.Serve(lis)
+}
+
+// 过滤器
+func filter(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+	log.Println("filter:", info)
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("painc: %v", r)
+		}
+	}()
+	return handler(ctx, req)
 }
