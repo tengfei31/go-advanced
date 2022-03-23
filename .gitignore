@@ -17,3 +17,6 @@
 # idea
 .idea
 .vscode
+
+#mac OS
+.DS_Store
