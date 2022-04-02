@@ -23,4 +23,4 @@ __debug_bin
 .DS_Store
 
 #proto  *.go
-#grpc/proto/*.go
+grpc/proto/*.go
