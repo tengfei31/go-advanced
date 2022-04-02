@@ -5,14 +5,25 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "server_test",
+            "name": "server_test_rest_rpc",
             "type": "go",
             "request": "launch",
             "mode": "test",
             "program": "${workspaceFolder}/grpc/server_test.go",
             "args": [
                 "-test.run",
-                "TestPubsubServiceTLS"
+                "TestRestRpcService"
+            ]
+        },
+        {
+            "name": "server_test_rest_http",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${workspaceFolder}/grpc/server_test.go",
+            "args": [
+                "-test.run",
+                "TestRestHttpService"
             ]
         },
         {

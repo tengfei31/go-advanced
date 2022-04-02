@@ -1,10 +1,22 @@
 syntax = "proto3";
 
-import "github.com/mwitkow/go-proto-validators@v0.3.2/validator.proto";
+//`go env GOPATH`/pkg/mod/github.com/mwitkow/go-proto-validators@v0.3.2
+import "validator.proto";
+//`go env GOPATH`/pkg/mod/github.com/grpc-ecosystem/grpc-gateway@v1.16.0/third_party/googleapis
+import "google/api/annotations.proto";
 
 package proto;
 
 option go_package = "./proto";
+
+/**
+protoc -I`go env GOPATH`/pkg/mod \
+  -I`go env GOPATH`/pkg/mod/github.com/mwitkow/go-proto-validators@v0.3.2 \
+  -I./proto -I`go env GOPATH`/pkg/mod/github.com/grpc-ecosystem/grpc-gateway@v1.16.0/third_party/googleapis  \
+  //--swagger_out=. \
+  --govalidators_out=. --grpc-gateway_out=.  \
+  --go_out=plugins=grpc:. ./proto/hello.proto
+ */
 
 message String {
   string value = 1;
@@ -30,4 +42,21 @@ message Message {
   ];
 }
 
+message StringMessage {
+  string value = 1;
+}
+
+service RestService {
+  rpc Get(StringMessage) returns (StringMessage) {
+    option (google.api.http) = {
+      get: "/get/{value}"
+    };
+  }
+  rpc Post(StringMessage) returns (StringMessage) {
+    option (google.api.http) = {
+      post: "/post"
+      body: "*"
+    };
+  }
+}
 

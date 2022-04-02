@@ -1,13 +1,17 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"go-advanced/grpc/proto"
 	"io/ioutil"
 	"log"
 	"net"
+	"net/http"
 	"testing"
+
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
@@ -78,6 +82,33 @@ func TestPubsubServiceNoTLS(t *testing.T) {
 	grpcServer := grpc.NewServer()
 	proto.RegisterPubsubServiceServer(grpcServer, NewPubsubService())
 	lis, err := net.Listen("tcp", ":1234")
+	if err != nil {
+		log.Fatal(err)
+	}
+	grpcServer.Serve(lis)
+}
+
+// 启动rest http服务，调用rpc接口
+func TestRestHttpService(t *testing.T) {
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	mux := runtime.NewServeMux()
+
+	err := proto.RegisterRestServiceHandlerFromEndpoint(ctx, mux, ":6000", []grpc.DialOption{grpc.WithInsecure()})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	http.ListenAndServe(":8000", mux)
+}
+
+// 启动rest rpc服务
+func TestRestRpcService(t *testing.T) {
+	grpcServer := grpc.NewServer()
+	proto.RegisterRestServiceServer(grpcServer, new(RestServiceImpl))
+	lis, err := net.Listen("tcp", ":6000")
 	if err != nil {
 		log.Fatal(err)
 	}

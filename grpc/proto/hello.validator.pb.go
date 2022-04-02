@@ -8,6 +8,7 @@ import (
 	math "math"
 	proto "github.com/golang/protobuf/proto"
 	_ "github.com/mwitkow/go-proto-validators"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	regexp "regexp"
 	github_com_mwitkow_go_proto_validators "github.com/mwitkow/go-proto-validators"
 )
@@ -33,5 +34,8 @@ func (this *Message) Validate() error {
 	if !(this.Age < 100) {
 		return github_com_mwitkow_go_proto_validators.FieldError("Age", fmt.Errorf(`value '%v' must be less than '100'`, this.Age))
 	}
+	return nil
+}
+func (this *StringMessage) Validate() error {
 	return nil
 }

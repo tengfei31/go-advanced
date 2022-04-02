@@ -123,3 +123,14 @@ func (auth *Authentication) Auth(ctx context.Context) error {
 
 	return nil
 }
+
+type RestServiceImpl struct {}
+
+func (r *RestServiceImpl) Get(ctx context.Context, message *proto.StringMessage) (*proto.StringMessage, error) {
+	return &proto.StringMessage{Value: "Get hi:" + message.GetValue() + "#"}, nil
+}
+
+func (r *RestServiceImpl) Post(ctx context.Context, message *proto.StringMessage) (*proto.StringMessage, error) {
+	return &proto.StringMessage{Value: "Post hi:" + message.GetValue() + "@"}, nil
+}
+

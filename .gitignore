@@ -17,6 +17,10 @@
 # idea
 .idea
 .vscode/settings.json
+__debug_bin
 
 #mac OS
 .DS_Store
+
+#proto  *.go
+#grpc/proto/*.go
