@@ -16,6 +16,7 @@ import (
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/reflection"
 )
 
 func TestHelloServiceImpl(t *testing.T) {
@@ -32,6 +33,8 @@ func TestHelloServiceImpl(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	//利用反射查看grpc的服务
+	reflection.Register(grpcServer)
 	grpcServer.Serve(lis)
 }
 
@@ -113,4 +116,8 @@ func TestRestRpcService(t *testing.T) {
 		log.Fatal(err)
 	}
 	grpcServer.Serve(lis)
+}
+
+func TestReflectionService(t *testing.T) {
+
 }

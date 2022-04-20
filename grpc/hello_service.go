@@ -3,15 +3,16 @@ package main
 import (
 	"context"
 	"fmt"
+	"go-advanced/grpc/proto"
+	"io"
+	"strings"
+	"time"
+
 	"github.com/docker/docker/pkg/pubsub"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"io"
-	"strings"
-	"time"
 )
-import "go-advanced/grpc/proto"
 
 // 增加用户认证
 type grpcServer struct {
@@ -124,7 +125,7 @@ func (auth *Authentication) Auth(ctx context.Context) error {
 	return nil
 }
 
-type RestServiceImpl struct {}
+type RestServiceImpl struct{}
 
 func (r *RestServiceImpl) Get(ctx context.Context, message *proto.StringMessage) (*proto.StringMessage, error) {
 	return &proto.StringMessage{Value: "Get hi:" + message.GetValue() + "#"}, nil
@@ -133,4 +134,3 @@ func (r *RestServiceImpl) Get(ctx context.Context, message *proto.StringMessage)
 func (r *RestServiceImpl) Post(ctx context.Context, message *proto.StringMessage) (*proto.StringMessage, error) {
 	return &proto.StringMessage{Value: "Post hi:" + message.GetValue() + "@"}, nil
 }
-
