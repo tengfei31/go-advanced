@@ -10,6 +10,8 @@ import (
 	"github.com/sony/sonyflake"
 )
 
+//分布式ID
+
 func getMachineID() (uint16, error) {
 	var machineID uint16
 	var err error
