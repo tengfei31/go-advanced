@@ -12,7 +12,7 @@ func TestLockChan(t *testing.T) {
 	var counter int
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
-		go func(){
+		go func() {
 			defer wg.Done()
 			// defer lock.UnLock()
 			if !lock.Lock() {
@@ -22,6 +22,18 @@ func TestLockChan(t *testing.T) {
 			counter++
 			log.Print("current counter:", counter)
 			lock.UnLock()
+		}()
+	}
+	wg.Wait()
+}
+
+func TestLockRedis(t *testing.T) {
+	var wg sync.WaitGroup
+	for i := 0; i < 50; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			incr()
 		}()
 	}
 	wg.Wait()
