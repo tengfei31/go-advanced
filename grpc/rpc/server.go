@@ -10,14 +10,6 @@ import (
 	"time"
 )
 
-func main() {
-	//RegisterRpc()
-	//RegisterHttpRpc()
-	//RegisterKVStoreRpc()
-	//reverseProxy()
-	RegisterContextRpc()
-}
-
 func RegisterRpc() {
 	RegisterHelloService(new(HelloService))
 	listener, err := net.Listen("tcp", ":6666")

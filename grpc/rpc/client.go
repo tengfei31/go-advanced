@@ -8,13 +8,6 @@ import (
 	"time"
 )
 
-func main() {
-	Client()
-	//JsonClient()
-	//kvStoreClient()
-	//proxyClient()
-}
-
 func Client() {
 	client, err := DialHelloService("tcp", "127.0.0.1:1234")
 	if err != nil {

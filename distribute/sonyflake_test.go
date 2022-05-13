@@ -1,8 +1,8 @@
 package distribute
 
 import (
-	"fmt"
 	"log"
+	"math/rand"
 	"testing"
 )
 
@@ -12,5 +12,10 @@ func TestSonyflake(t *testing.T) {
 		log.Fatal(err)
 	}
 	log.Print("id:", id)
-	fmt.Print("id:", id)
+}
+
+
+func TestRand(t *testing.T) {
+	slice := rand.Perm(7)
+	log.Print(slice)
 }
